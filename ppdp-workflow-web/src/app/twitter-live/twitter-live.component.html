@@ -1,0 +1,194 @@
+<div class="app-content">
+    <mat-card>
+        <mat-card-content>
+            <form> 
+                <mat-form-field style="width: 50%;">
+                    <input matInput placeholder="Input Keyword" [(ngModel)]="keyword"  [ngModelOptions]="{standalone: true}" >
+                </mat-form-field>
+              </form>
+            <button mat-raised-button color="accent" (click)="clearSentence()" style="margin-right: 10px;">CLEAR</button>
+            <button mat-raised-button color="primary" (click)="exportAndPseudoanonymize()"> EXPORT AND ANONYMIZE</button>
+            <button mat-raised-button color="primary" style="margin-left: 10px;" (click)="evaluate()">EVALUATE</button>
+            <mat-progress-spinner diameter="40"
+                mode="indeterminate" value="100" style="float: right;" *ngIf="showSpinner"></mat-progress-spinner>
+            <p style="float: right;" [hidden]="!isLoaded" >Tweets Exported successfully</p>
+         
+          </mat-card-content>
+   </mat-card>
+   <mat-accordion>
+            <mat-expansion-panel [expanded] = "isAnonymizationPanelExpanded">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  Anonymization
+                </mat-panel-title>
+               </mat-expansion-panel-header>
+               <mat-card style="border: outset; margin: 10px;max-height: 400px; overflow-y: scroll;">
+                <mat-card-header>
+                    <mat-card-title>Tagged sentences</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                    <p style="padding: 5px;" *ngFor="let tag of taggedSentences" [innerHTML]="checkSentence(tag) | safeHtml"></p>        
+                    </mat-card-content>  
+                </mat-card>   
+                <mat-card style="border: outset; margin: 10px;max-height: 400px; overflow-y: scroll;">
+                    <mat-card-header>
+                        <mat-card-title>Anonymized sentences</mat-card-title>
+                      </mat-card-header>
+                      <mat-card-content>
+                        <p *ngFor="let sent of sanitizedSentences">{{sent}}</p>        
+                      </mat-card-content>  
+                </mat-card> 
+                  
+            </mat-expansion-panel>
+    </mat-accordion>
+    <mat-accordion>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Metrics
+            </mat-panel-title>
+           </mat-expansion-panel-header>
+           <mat-card style="border: outset; margin: 10px;">
+            <mat-card-header>
+                <mat-card-title>Anonymization statistics</mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <p>Sanitization count: {{sanitizationCount}}</p>   
+                <p>Sanitization percentage: {{sanitizationPercentage}}</p>        
+              </mat-card-content>  
+        </mat-card>
+        <mat-card style="border: outset; margin: 10px; overflow-x: scroll;">
+            <mat-card-header>
+                <mat-card-title>Discernability Metrics</mat-card-title>
+              </mat-card-header>
+            <mat-card-content>
+                <div fxLayout="row">
+                    <google-chart #chart
+                    [title]="titleGenderDisc"
+                    [type]="type"
+                    [data]="dataGenderDisc"
+                    [columnNames]="columnNames"
+                    [options]="options">
+                    </google-chart> 
+
+                    <google-chart #chart
+                    [title]="titleAgeDisc"
+                    [type]="type"
+                    [data]="dataAgeDisc"
+                    [columnNames]="columnNames"
+                    [options]="options">
+                    </google-chart> 
+
+                    <google-chart #chart
+                    [title]="titleJobDisc"
+                    [type]="type"
+                    [data]="dataJobDisc"
+                    [columnNames]="columnNames"
+                    [options]="options">
+                    </google-chart> 
+
+                    <google-chart #chart
+                    [title]="titleRegionDisc"
+                    [type]="type"
+                    [data]="dataRegionDisc"
+                    [columnNames]="columnNames"
+                    [options]="options">
+                    </google-chart> 
+
+                    <google-chart #chart
+                    [title]="titleReligionDisc"
+                    [type]="type"
+                    [data]="dataReligionDisc"
+                    [columnNames]="columnNames"
+                    [options]="options">
+                    </google-chart>
+
+                    <google-chart #chart
+                    [title]="titleLanguageDisc"
+                    [type]="type"
+                    [data]="dataLanguageDisc"
+                    [columnNames]="columnNames"
+                    [options]="options">
+                    </google-chart>
+
+                    <google-chart #chart
+                    [title]="titleMaritalDisc"
+                    [type]="type"
+                    [data]="dataMaritalDisc"
+                    [columnNames]="columnNames"
+                    [options]="options">
+                    </google-chart>
+                
+                </div>
+            </mat-card-content>      
+        </mat-card>
+        <mat-card style="border: outset; margin: 10px; overflow-x: scroll;">
+            <mat-card-header>
+                <mat-card-title>Loss Metrics</mat-card-title>
+              </mat-card-header>
+            <mat-card-content>
+                <div fxLayout="row">
+                    <google-chart #chart
+                    [title]="titleGenderLoss"
+                    [type]="type"
+                    [data]="dataGenderLoss"
+                    [columnNames]="columnNamesLoss"
+                    [options]="options">
+                    </google-chart> 
+
+                    <google-chart #chart
+                    [title]="titleAgeLoss"
+                    [type]="type"
+                    [data]="dataAgeLoss"
+                    [columnNames]="columnNamesLoss"
+                    [options]="options">
+                    </google-chart> 
+
+                    <google-chart #chart
+                    [title]="titleJobLoss"
+                    [type]="type"
+                    [data]="dataJobLoss"
+                    [columnNames]="columnNamesLoss"
+                    [options]="options">
+                    </google-chart>
+
+                    <google-chart #chart
+                    [title]="titleRegionLoss"
+                    [type]="type"
+                    [data]="dataRegionLoss"
+                    [columnNames]="columnNamesLoss"
+                    [options]="options">
+                    </google-chart> 
+
+                    <google-chart #chart
+                    [title]="titleReligionLoss"
+                    [type]="type"
+                    [data]="dataReligionLoss"
+                    [columnNames]="columnNamesLoss"
+                    [options]="options">
+                    </google-chart> 
+
+                    <google-chart #chart
+                    [title]="titleLanguageLoss"
+                    [type]="type"
+                    [data]="dataLanguageLoss"
+                    [columnNames]="columnNamesLoss"
+                    [options]="options">
+                    </google-chart> 
+
+                    <google-chart #chart
+                    [title]="titleMaritalLoss"
+                    [type]="type"
+                    [data]="dataMaritalLoss"
+                    [columnNames]="columnNamesLoss"
+                    [options]="options">
+                    </google-chart> 
+        
+                </div>
+            </mat-card-content>      
+        </mat-card>
+      
+     </mat-expansion-panel>
+     </mat-accordion>
+  
+    </div> 

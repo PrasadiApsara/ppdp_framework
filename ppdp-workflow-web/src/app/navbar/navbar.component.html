@@ -1,0 +1,21 @@
+<mat-sidenav-container> 
+    <mat-sidenav #sidenav mode="side"  class="app-sidenav">
+      <mat-nav-list>
+  
+        <!-- <a mat-list-item [routerLink]="''"> Build Model </a> -->
+        <a mat-list-item [routerLink]="''"> Single Sentence - Anonymization Flow </a>
+        <a mat-list-item [routerLink]="'/experiment'" routerLinkActive="active"> Experimental Data Set - Simple Anonymization </a>
+        <a mat-list-item [routerLink]="'/experimentkanonymize'" routerLinkActive="active"> Experimental Data Set - K Anonymization </a>
+        <a mat-list-item [routerLink]="'/twitter-live'" routerLinkActive="active"> Real Time Twitter Data Set - Simple Anonymization</a>
+        <a mat-list-item [routerLink]="'/kanonymize'" routerLinkActive="active">Real Time Twitter Data Set - K-Anonymization </a>
+        <a mat-list-item [routerLink]="'/experimentUtility'" routerLinkActive="active">Usability Expeiment </a>
+      
+      </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <app-tool-bar [sidenav]="sidenav"></app-tool-bar> 
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+
+     
+   </mat-sidenav-container>

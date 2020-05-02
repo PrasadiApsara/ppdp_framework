@@ -1,0 +1,121 @@
+{
+  "info": {
+    "description": "Prasadi Abeywardana",
+    "version": "1.0.0",
+    "title": "PPDP workflow",
+    "contact": {
+      "email": "prasadiapsara.gl@gmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "tags": [
+    {
+      "name": "Train Model",
+      "description": "API for training the privacy attribute extraction ML model"
+    },
+    {
+      "name": "Annotate Sentence",
+      "description": "API for automatically tagging each privacy related attribute within a sentence/tweet"
+    },
+    {
+      "name": "Anonymization",
+      "description": "API for performing anonymization on a dataset created real time from Twitter"
+    },
+    {
+      "name": "Utility Metrics",
+      "description": "API for computing utility metrics on the anonymized data"
+    }
+  ],
+  "swagger": "2.0",
+  "paths": {
+    "/train": {
+      "get": {
+        "tags": [
+          "Train Model"
+        ],
+        "summary": "Returns model scores",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/tag": {
+      "post": {
+        "tags": [
+          "Annotate Sentence"
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "description": "sentence/tweet to be tagged",
+            "value": "My English teacher who lived in Nepal died of Cancer at age 65"
+          }
+        ],
+        "summary": "Returns a tagged sentence",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/export": {
+      "post": {
+        "tags": [
+          "Anonymization"
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "description": "keyword to extract tweets from Twitter",
+            "value": "cancer"
+          }
+        ],
+        "summary": "Anonymize data using simple anonymization and exports anonymized data to a csv",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/exportkanonymize": {
+      "post": {
+        "tags": [
+          "Anonymization"
+        ],
+        "parameters": [
+          {
+            "type": "string",
+            "description": "keyword to extract tweets from Twitter",
+            "value": "cancer"
+          }
+        ],
+        "summary": "Anonymize data using k anonymization and exports anonymized data to a csv",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/evaluate": {
+      "get": {
+        "tags": [
+          "Utility Metrics"
+        ],
+        "summary": "Computed utility metrics on sanitized data",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}

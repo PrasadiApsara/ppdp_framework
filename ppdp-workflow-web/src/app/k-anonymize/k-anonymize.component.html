@@ -1,0 +1,263 @@
+<div class="app-content">
+
+    <mat-card>
+        <mat-card-content>
+            <form> 
+                <mat-form-field style="width: 50%;">
+                    <input matInput placeholder="Input Keyword" [(ngModel)]="keyword"  [ngModelOptions]="{standalone: true}">
+                </mat-form-field>
+              </form>
+            <button mat-raised-button color="accent" (click)="clearSentence()" style="margin-right: 10px;">CLEAR</button>
+            <button mat-raised-button color="primary" (click)="exportAndKanonymize()"> EXPORT AND ANONYMIZE</button>
+            <button mat-raised-button color="primary" style="margin-left: 10px;" (click)="evaluate()">EVALUATE</button>
+            <mat-progress-spinner diameter="40"
+                mode="indeterminate" value="100" style="float: right;" *ngIf="showSpinner"></mat-progress-spinner>
+        <p style="float: right;" [hidden]="!isLoaded" >Tweets Exported successfully</p>
+          </mat-card-content>
+        
+    </mat-card>
+    <mat-accordion>
+      <mat-expansion-panel [expanded] = "isAnonymizationPanelExpanded">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Anonymization
+          </mat-panel-title>
+         </mat-expansion-panel-header>
+         <mat-card style="border: outset; margin: 10px; max-height: 400px; overflow-y: scroll;">
+          <mat-card-header>
+              <mat-card-title>K-anonymized structured data</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+              <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="width: 100%; max-height: 400px; overflow-y: scroll;">
+  
+                  <!--- Note that these columns can be defined in any order.
+                        The actual rendered columns are set as a property on the row definition" -->
+                
+                  <!-- Position Column -->
+                  <ng-container matColumnDef="age">
+                    <th mat-header-cell *matHeaderCellDef> Age </th>
+                    <td mat-cell *matCellDef="let element"> {{element.age}} </td>
+                  </ng-container>
+                
+                  <!-- Name Column -->
+                  <ng-container matColumnDef="gender">
+                    <th mat-header-cell *matHeaderCellDef> Gender </th>
+                    <td mat-cell *matCellDef="let element"> {{element.gender}} </td>
+                  </ng-container>
+                
+                  <!-- Weight Column -->
+                  <ng-container matColumnDef="job">
+                    <th mat-header-cell *matHeaderCellDef> Job </th>
+                    <td mat-cell *matCellDef="let element"> {{element.job}} </td>
+                  </ng-container>
+                
+                  <!-- Symbol Column -->
+                  <ng-container matColumnDef="region">
+                    <th mat-header-cell *matHeaderCellDef> Region </th>
+                    <td mat-cell *matCellDef="let element"> {{element.region}} </td>
+                  </ng-container>
+  
+                  <!-- Symbol Column -->
+                  <ng-container matColumnDef="religion">
+                    <th mat-header-cell *matHeaderCellDef> Religion </th>
+                    <td mat-cell *matCellDef="let element"> {{element.religion}} </td>
+                  </ng-container>
+  
+                  <!-- Symbol Column -->
+                  <ng-container matColumnDef="language">
+                    <th mat-header-cell *matHeaderCellDef> Language </th>
+                    <td mat-cell *matCellDef="let element"> {{element.language}} </td>
+                  </ng-container>
+  
+                   <!-- Symbol Column -->
+                   <ng-container matColumnDef="marital">
+                    <th mat-header-cell *matHeaderCellDef> Marital Status </th>
+                    <td mat-cell *matCellDef="let element"> {{element.marital}} </td>
+                  </ng-container>
+  
+                   <!-- Symbol Column -->
+                   <ng-container matColumnDef="sa">
+                      <th mat-header-cell *matHeaderCellDef> SA </th>
+                      <td mat-cell *matCellDef="let element"> {{element.sa}} </td>
+                    </ng-container>
+  
+                  <!-- Weight Column -->
+                  <ng-container matColumnDef="count">
+                      <th mat-header-cell *matHeaderCellDef> Count </th>
+                      <td mat-cell *matCellDef="let element"> {{element.count}} </td>
+                    </ng-container>
+                  
+                    <!-- Symbol Column -->
+                    <ng-container matColumnDef="rows">
+                      <th mat-header-cell *matHeaderCellDef> Rows </th>
+                      <td mat-cell *matCellDef="let element"> {{element.rows}} </td>
+                    </ng-container>
+                
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+                
+          </mat-card-content>
+      </mat-card>
+      <mat-card style="border: outset; margin: 10px; max-height: 400px; overflow-y: scroll;">
+        <mat-card-header>
+            <mat-card-title>Anonymized sentences</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p *ngFor="let sent of sanitizedSentences">{{sent}}</p>        
+          </mat-card-content>  
+    </mat-card>
+            
+      </mat-expansion-panel>
+</mat-accordion>
+  
+<mat-accordion>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Metrics
+      </mat-panel-title>
+     </mat-expansion-panel-header>
+     <mat-card style="border: outset; margin: 10px;">
+      <mat-card-header>
+          <mat-card-title>Anonymization statistics</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Sanitization count: {{sanitizationCount}}</p>   
+          <p>Sanitization percentage: {{sanitizationPercentage}}</p>        
+        </mat-card-content>  
+  </mat-card>
+    <mat-card style="border: outset; margin: 10px; overflow-x: scroll;">
+        <mat-card-header>
+            <mat-card-title>Discernability Metrics</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div fxLayout="row">
+                <google-chart #chart
+                [title]="titleGenderDisc"
+                [type]="type"
+                [data]="dataGenderDisc"
+                [columnNames]="columnNames"
+                [options]="options">
+                </google-chart> 
+
+                <google-chart #chart
+                [title]="titleAgeDisc"
+                [type]="type"
+                [data]="dataAgeDisc"
+                [columnNames]="columnNames"
+                [options]="options">
+                </google-chart> 
+
+                <google-chart #chart
+                [title]="titleJobDisc"
+                [type]="type"
+                [data]="dataJobDisc"
+                [columnNames]="columnNames"
+                [options]="options">
+                </google-chart> 
+
+                <google-chart #chart
+                [title]="titleRegionDisc"
+                [type]="type"
+                [data]="dataRegionDisc"
+                [columnNames]="columnNames"
+                [options]="options">
+                </google-chart> 
+
+                <google-chart #chart
+                [title]="titleReligionDisc"
+                [type]="type"
+                [data]="dataReligionDisc"
+                [columnNames]="columnNames"
+                [options]="options">
+                </google-chart>
+
+                <google-chart #chart
+                [title]="titleLanguageDisc"
+                [type]="type"
+                [data]="dataLanguageDisc"
+                [columnNames]="columnNames"
+                [options]="options">
+                </google-chart>
+
+                <google-chart #chart
+                [title]="titleMaritalDisc"
+                [type]="type"
+                [data]="dataMaritalDisc"
+                [columnNames]="columnNames"
+                [options]="options">
+                </google-chart>
+    
+            </div>
+        </mat-card-content>      
+    </mat-card>
+    <mat-card style="border: outset; margin: 10px; overflow-x: scroll;">
+        <mat-card-header>
+            <mat-card-title>Loss Metrics</mat-card-title>
+          </mat-card-header>
+        <mat-card-content>
+            <div fxLayout="row">
+                <google-chart #chart
+                [title]="titleGenderLoss"
+                [type]="type"
+                [data]="dataGenderLoss"
+                [columnNames]="columnNamesLoss"
+                [options]="options">
+                </google-chart> 
+
+                <google-chart #chart
+                [title]="titleAgeLoss"
+                [type]="type"
+                [data]="dataAgeLoss"
+                [columnNames]="columnNamesLoss"
+                [options]="options">
+                </google-chart> 
+
+                <google-chart #chart
+                [title]="titleJobLoss"
+                [type]="type"
+                [data]="dataJobLoss"
+                [columnNames]="columnNamesLoss"
+                [options]="options">
+                </google-chart>
+
+                <google-chart #chart
+                [title]="titleRegionLoss"
+                [type]="type"
+                [data]="dataRegionLoss"
+                [columnNames]="columnNamesLoss"
+                [options]="options">
+                </google-chart> 
+
+                <google-chart #chart
+                [title]="titleReligionLoss"
+                [type]="type"
+                [data]="dataReligionLoss"
+                [columnNames]="columnNamesLoss"
+                [options]="options">
+                </google-chart> 
+
+                <google-chart #chart
+                [title]="titleLanguageLoss"
+                [type]="type"
+                [data]="dataLanguageLoss"
+                [columnNames]="columnNamesLoss"
+                [options]="options">
+                </google-chart> 
+
+                <google-chart #chart
+                [title]="titleMaritalLoss"
+                [type]="type"
+                [data]="dataMaritalLoss"
+                [columnNames]="columnNamesLoss"
+                [options]="options">
+                </google-chart> 
+    
+            </div>
+        </mat-card-content>      
+    </mat-card>         
+  </mat-expansion-panel>
+</mat-accordion>
+  
+    </div> 

@@ -1,0 +1,39 @@
+<div class="app-content">
+    <mat-card>
+        <mat-card-content>
+          <p>Try out anonymization on a single sentence and understand how this</p>
+            <form> 
+                <mat-form-field style="width: 50%;">
+                  <textarea rows="5"  matInput placeholder="Input Sentence" [(ngModel)]="sentence" [ngModelOptions]="{standalone: true}"></textarea>
+                </mat-form-field>
+              </form>
+            <button mat-raised-button color="accent" (click)="clearSentence()">CLEAR</button>
+            <button mat-raised-button color="primary" style="margin-left: 10px;" (click)="pseudoanonymize()"> TAG</button>
+            <mat-progress-spinner diameter="40"
+              mode="indeterminate" value="100" style="float: right;" *ngIf="showSpinner"></mat-progress-spinner>
+          </mat-card-content>
+        
+    </mat-card>
+
+    <mat-card style="background-color: antiquewhite;">
+        <mat-card-header>
+            <mat-card-title>Tagged sentence</mat-card-title>
+          </mat-card-header>
+        <mat-card-content>
+            <p [innerHTML]="checkSentence() | safeHtml"></p>
+          </mat-card-content>
+        
+    </mat-card>
+
+    <mat-card style="background-color: antiquewhite;">
+        <mat-card-header>
+            <mat-card-title>Anonymized sentence</mat-card-title>
+          </mat-card-header>
+        <mat-card-content>
+            <p>{{anonymizedSentence}}</p>
+          </mat-card-content>
+        
+    </mat-card>
+
+
+    </div> 

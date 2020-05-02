@@ -1,0 +1,29 @@
+<div class="app-content">
+
+    <mat-card>
+        <mat-card-content>
+            <p>Click the button to train the tagger</p>
+            <button mat-raised-button color="accent" (click)="onTrainButtonClicked()" >TRAIN THE TAGGER</button>
+            <mat-progress-spinner diameter="40"
+            mode="indeterminate" value="100" style="float: right;" *ngIf="showSpinner"></mat-progress-spinner>
+            <p style="float: right;" [hidden]="!isLoaded" >Model Trained successfully</p>
+          </mat-card-content>
+          <mat-card-actions>
+            <!-- <button mat-button>LIKE</button>
+            <button mat-button>SHARE</button> -->
+          </mat-card-actions>
+      
+    </mat-card>
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Model information</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-chip-list >
+          <mat-chip style="margin-top: 20px;">Model accuracy: {{modelAccuracy}} </mat-chip>
+          <mat-chip style="margin-top: 20px;">Model type: {{modelType}} </mat-chip>
+          <mat-chip style="margin-top: 20px;">Tag categories: {{tagCategories}} </mat-chip>
+      </mat-chip-list>
+      </mat-card-content>
+    </mat-card>
+    </div> 
