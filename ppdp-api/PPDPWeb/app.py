@@ -555,6 +555,8 @@ class PPDPIntegrator(Resource):
         genderarrayLoss = []
         for group in countsOriginal:
             if group["_id"] != "":
+                print(group["count"])
+                print(countsOriginal)
                 grouparray = [group["_id"], group["count"]/len(countsOriginal)]
                 genderarrayLoss.append(grouparray)
 
@@ -778,6 +780,61 @@ class PPDPIntegrator(Resource):
         train = pd.read_csv('D:/Projects/Other/ppdp-framework/classification_train_anonymized.csv', encoding='latin1')
         print(train)
         test = pd.read_csv('D:/Projects/Other/ppdp-framework/classification_test_anonymized.csv', encoding='latin1')
+        print(test)
+        combi = train.append(test, ignore_index=True)
+
+        #combi['tidy_tweet'] = np.vectorize(ppdp.remove_pattern(combi['tweet'], "@[\w]*"))
+        combi['tidy_tweet'] = combi['tweet']
+        combi['tidy_tweet'] = combi['tidy_tweet'].str.replace("[^a-zA-Z#]", " ")
+        combi['tidy_tweet'] = combi['tidy_tweet'].apply(lambda x: ' '.join([w for w in str(x).split() if len(w)>3]))
+        print(combi)
+        tokenized_tweet = combi['tidy_tweet'].apply(lambda x: str(x).split())
+
+        stemmer = PorterStemmer()
+
+        tokenized_tweet = tokenized_tweet.apply(lambda x: [stemmer.stem(i) for i in x])
+        for i in range(len(tokenized_tweet)):
+            tokenized_tweet[i] = ' '.join(tokenized_tweet[i])
+
+        combi['tidy_tweet'] = tokenized_tweet
+
+        all_words = ' '.join([text for text in combi['tidy_tweet']])
+        normal_words =' '.join([text for text in combi['tidy_tweet'][combi['label'] == 0]])
+        negative_words = ' '.join([text for text in combi['tidy_tweet'][combi['label'] == 1]])
+
+        HT_regular = ppdp.hashtag_extract(combi['tidy_tweet'][combi['label'] == 0])
+        HT_negative = ppdp.hashtag_extract(combi['tidy_tweet'][combi['label'] == 1])
+        HT_regular = sum(HT_regular,[])
+        HT_negative = sum(HT_negative,[])
+        
+        bow_vectorizer = CountVectorizer(max_df=0.90, min_df=2, max_features=1000, stop_words='english')
+        bow = bow_vectorizer.fit_transform(combi['tidy_tweet'])
+        tfidf_vectorizer = TfidfVectorizer(max_df=0.90, min_df=2, max_features=1000, stop_words='english')
+        tfidf = tfidf_vectorizer.fit_transform(combi['tidy_tweet'])
+
+        train_bow = bow[:31962,:]
+        test_bow = bow[31962:,:]
+
+        # splitting data into training and validation set
+        xtrain_bow, xvalid_bow, ytrain, yvalid = train_test_split(train_bow, train['label'], random_state=42, test_size=0.3)
+
+        print("********************** model training")
+        lreg = LogisticRegression()
+        lreg.fit(xtrain_bow, ytrain) # training the model
+
+        prediction = lreg.predict_proba(xvalid_bow) # predicting on the validation set
+        prediction_int = prediction[:,1] >= 0.3 # if prediction is greater than or equal to 0.3 than 1 else 0
+        prediction_int = prediction_int.astype(np.int)
+
+        f1 = f1_score(yvalid, prediction_int)# calculating f1 score
+        print(str(f1))
+        return jsonify(accuracy = str(f1))
+
+    @app.route('/utilityExperimentKAnonymize/')
+    def utilityExperimentKAnonymize():
+        train = pd.read_csv('D:/Personal/MSc/Project/ppdp/classification_train_kanonymized.csv', encoding='latin1')
+        print(train)
+        test = pd.read_csv('D:/Personal/MSc/Project/ppdp/classification_test_kanonymized.csv', encoding='latin1')
         print(test)
         combi = train.append(test, ignore_index=True)
 
