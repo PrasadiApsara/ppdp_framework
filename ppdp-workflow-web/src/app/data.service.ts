@@ -43,4 +43,7 @@ export class DataService {
   getUtilityTestAnonymized(): Observable<any> {
     return this.http.get(`${this.API_URL}utilityExperimentAnonymize`);
   }
+  getUtilityTestKAnonymized(): Observable<any> {
+    return this.http.get(`${this.API_URL}utilityExperimentKAnonymize`);
+  }
 }
